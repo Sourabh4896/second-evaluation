@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:second_evaluation/main.dart';
 import 'dart:io';
 import 'dart:convert'; // For base64 encoding
+import './show_image_screen.dart'; // Import the new screen
 
 /// VerifyPage allows users to verify their face data.
 class VerifyPage extends StatefulWidget {
@@ -128,10 +128,14 @@ class _VerifyPageState extends State<VerifyPage> {
               SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {
-                  // Navigate to home page on confirmation
-                  Navigator.pushReplacement(
+                  // Navigate to another screen with the base64 data
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
+                    MaterialPageRoute(
+                      builder: (context) => ShowImageScreen(
+                        imageBlobData: _imageBlobData!,
+                      ),
+                    ),
                   );
                 },
                 icon: Icon(Icons.check_circle),
@@ -161,22 +165,6 @@ class _VerifyPageState extends State<VerifyPage> {
                 child: Text(
                   'Cancel',
                   style: TextStyle(fontSize: 16, color: Colors.red),
-                ),
-              ),
-            ],
-            // Display the blob data (base64 encoded image)
-            if (_imageBlobData != null) ...[
-              SizedBox(height: 20),
-              Text(
-                'Blob Data (Base64 Encoded):',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Text(
-                  _imageBlobData!,
-                  style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
               ),
             ],
