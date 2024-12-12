@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:second_evaluation/main.dart';
 import 'dart:io';
+import 'dart:convert'; // For base64 encoding
 
 /// VerifyPage allows users to verify their face data.
 class VerifyPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _VerifyPageState extends State<VerifyPage> {
   late List<CameraDescription> _cameras;
   bool _isCameraInitialized = false;
   XFile? _capturedImage; // To store the captured image
+  String? _imageBlobData; // To store the base64 encoded blob data
 
   @override
   void initState() {
@@ -42,12 +44,22 @@ class _VerifyPageState extends State<VerifyPage> {
     });
   }
 
-  // Capture image
+  // Capture image and convert to blob data (base64 encoding)
   void _captureImage() async {
     try {
       XFile image = await _cameraController.takePicture();
       setState(() {
         _capturedImage = image; // Store the captured image
+      });
+
+      // Convert the captured image to bytes and then to base64
+      File imageFile = File(image.path);
+      List<int> imageBytes = await imageFile.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+
+      // Store the base64 encoded image blob data
+      setState(() {
+        _imageBlobData = base64Image;
       });
     } catch (e) {
       print('Error capturing image: $e');
@@ -149,6 +161,22 @@ class _VerifyPageState extends State<VerifyPage> {
                 child: Text(
                   'Cancel',
                   style: TextStyle(fontSize: 16, color: Colors.red),
+                ),
+              ),
+            ],
+            // Display the blob data (base64 encoded image)
+            if (_imageBlobData != null) ...[
+              SizedBox(height: 20),
+              Text(
+                'Blob Data (Base64 Encoded):',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Text(
+                  _imageBlobData!,
+                  style: TextStyle(fontSize: 12, color: Colors.black),
                 ),
               ),
             ],
